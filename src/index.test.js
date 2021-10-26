@@ -1,7 +1,7 @@
 const assert = require('assert');
 
 const {
-  fetchPrices,
+  fetchTokenPrices,
   fetchArweaveStorageCost,
   calculate,
   _setCacheMs,
@@ -14,10 +14,10 @@ const sleep = (ms) => {
   });
 };
 
-describe('fetchPrices', () => {
+describe('fetchTokenPrices', () => {
   it('should work', async () => {
-    const result = await fetchPrices();
-    assert(!!(result?.solana?.usd && result?.arweave?.usd), 'invalid fetchPrices response');
+    const result = await fetchTokenPrices();
+    assert(!!(result?.solana?.usd && result?.arweave?.usd), 'invalid fetchTokenPrices response');
   })
 })
 
@@ -40,14 +40,14 @@ describe('cache', () => {
 
     {
       _setCacheMs(0)
-      await fetchPrices();
+      await fetchTokenPrices();
       await sleep(50);
       assert(_promiseMap.size === 0, 'value still cached');
     }
 
     {
       _setCacheMs(1000)
-      await fetchPrices();
+      await fetchTokenPrices();
       await sleep(20);
       assert(_promiseMap.size === 1, 'value not cached');
       await sleep(1200);
@@ -81,13 +81,13 @@ describe('calculate', () => {
     const fileSizes = [2000, 2022000];
     const result = await calculate(fileSizes);
 
-    assert(result.arweave > 0);
-    assert(result.solana > 0);
-    assert(result.arweavePrice > 0);
-    assert(result.solanaPrice > 0);
-    assert(result.exchangeRate > 0);
-    assert(result.byteCostInWinstons > 0);
+    assert(result.arweave > 0, result.arweave);
+    assert(result.solana > 0, result.solanaPrice);
+    assert(result.arweavePrice > 0, result.arweavePrice);
+    assert(result.solanaPrice > 0, result.solanaPrice);
+    assert(result.exchangeRate > 0, result.exchangeRate);
+    assert(result.byteCost > 0, result.byteCost);
     assert.strictEqual(result.totalBytes, fileSizes[0] + fileSizes[1]);
-    assert(result.fee > 0);
+    assert(result.fee > 0, result.fee);
   })
 })

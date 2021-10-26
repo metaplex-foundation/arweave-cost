@@ -1,6 +1,6 @@
 const got = require('got');
 const assert = require('assert');
-const debug = require('debug')('calculate-arweave-cost');
+const debug = require('debug')('arweave-cost');
 
 const ARWEAVE_URL = 'https://arweave.net';
 const CONVERSION_RATES_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=solana,arweave&vs_currencies=usd';
@@ -52,7 +52,7 @@ const memoize = (asyncFn: asyncFunction) => {
   };
 };
 
-export const fetchPrices = memoize(() => {
+export const fetchTokenPrices = memoize(() => {
   return got(CONVERSION_RATES_URL).json().then((body: any) => {
     if (!(body?.arweave?.usd && body?.solana?.usd)) {
       debug('Invalid coingecko response', body);
@@ -101,7 +101,7 @@ export const calculate = async (
   arweavePrice: number,
   solanaPrice: number,
   exchangeRate: number,
-  byteCostInWinstons: number,
+  byteCost: number,
   totalBytes: number,
   fee: number
 }> => {
@@ -112,13 +112,13 @@ export const calculate = async (
     return sum += fileSize;
   }, 0);
 
-  const [conversionRates, byteCostInWinstons] = await Promise.all([
-    fetchPrices(),
+  const [conversionRates, byteCost] = await Promise.all([
+    fetchTokenPrices(),
     fetchArweaveStorageCost(totalBytes)
   ]);
 
-  const fee = calculateFee(totalBytes, byteCostInWinstons);
-  const totalWinstonCost = byteCostInWinstons + fee;
+  const fee = calculateFee(totalBytes, byteCost);
+  const totalWinstonCost = byteCost + fee;
   const totalArCost = totalWinstonCost / WINSTON_MULTIPLIER;
 
   const arweavePrice = conversionRates.arweave.usd;
@@ -129,7 +129,7 @@ export const calculate = async (
     arweaveRate: arweavePrice,
     solanaRate: solanaPrice,
     exchangeRate,
-    byteCostInWinstons,
+    byteCost,
     WINSTON_MULTIPLIER,
     fee,
     totalWinstonCost,
@@ -143,7 +143,7 @@ export const calculate = async (
     arweavePrice,
     solanaPrice,
     exchangeRate,
-    byteCostInWinstons,
+    byteCost,
     totalBytes,
     fee
   };

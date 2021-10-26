@@ -11,9 +11,9 @@ const toInt = (val: any): number => parseInt(val, 10);
 type asyncFunction = (...args: any[]) => Promise<any>;
 
 /**
- * Cache promise results for 15 seconds
+ * Cache promise results for 30 seconds
  */
-let promiseCacheMs = 15000;
+let promiseCacheMs = 30000;
 export const _setCacheMs = (ms: number) => promiseCacheMs = ms;
 
 export const _promiseMap = new Map();

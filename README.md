@@ -2,6 +2,12 @@
 
 Calculates the cost of uploading files to arweave
 
+## Installation
+
+```
+npm i @metaplex/arweave-cost
+```
+
 ## Use
 
 ```js
@@ -53,4 +59,12 @@ Retreives the current price of AR and SOL from coingecko API.
 // Fetch the current arweave and solana prices
 const rates = await fetchPrices();
 console.log(rates.solana.usd, rates.arweave.usd); // 206.4  52.29
+```
+
+## Development
+
+### Running tests
+
+```
+npm test
 ```

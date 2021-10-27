@@ -1,4 +1,4 @@
-const got = require('got');
+const request = require('axios');
 const assert = require('assert');
 const debug = require('debug')('arweave-cost');
 
@@ -53,8 +53,9 @@ const memoize = (asyncFn: asyncFunction) => {
 };
 
 export const fetchTokenPrices = memoize(() => {
-  return got(CONVERSION_RATES_URL).json().then((body: any) => {
-    if (!(body?.arweave?.usd && body?.solana?.usd)) {
+  return request(CONVERSION_RATES_URL).then((response: any) => {
+    const body = response.data;
+    if (!(body.arweave?.usd && body.solana?.usd)) {
       debug('Invalid coingecko response', body);
       throw new Error('Invalid response from coingecko');
     }
@@ -65,7 +66,7 @@ export const fetchTokenPrices = memoize(() => {
 
 export const fetchArweaveStorageCost = memoize((totalBytes: number) => {
   assert(Number.isFinite(totalBytes), `Invalid argument: totalBytes. Received: ${totalBytes}`);
-  return got(`${ARWEAVE_URL}/price/${totalBytes}`).then((response: { body: any }) => toInt(response.body));
+  return request(`${ARWEAVE_URL}/price/${totalBytes}`).then((response: { data: any }) => toInt(response.data));
 });
 
 const validate = (fileSizes: number[]): void => {

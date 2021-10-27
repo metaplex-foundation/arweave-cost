@@ -40,7 +40,9 @@ const memoPromise = (method: asyncFunction, args: any[]) => {
   }, promiseCacheMs);
 
   // allow program exit while timer is active
-  timer.unref();
+  if (timer.unref) {
+    timer.unref();
+  }
 
   return promise;
 };

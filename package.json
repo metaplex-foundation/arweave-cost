@@ -1,6 +1,6 @@
 {
   "name": "@metaplex/arweave-cost",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Calculates the cost of uploading files to arweave",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",

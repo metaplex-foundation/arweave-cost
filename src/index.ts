@@ -5,7 +5,11 @@ const assert = (truthy: any, msg: string) => {
   if (!truthy) throw new Error(msg);
 };
 
-const ARWEAVE_URL = 'https://arweave.net';
+// arbundler uses a pricing endpoint which also accurately captures L2 fees.
+// https://node1.bundlr.network/price/{totalUploadedBytes}
+// internal fee calculation: fee(n) = bundler fee * l1_fee(1) * max(n, 2048) * network difficulty multiplier
+
+const ARWEAVE_URL = 'https://node1.bundlr.network';
 const CONVERSION_RATES_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=solana,arweave&vs_currencies=usd';
 const WINSTON_MULTIPLIER = 10 ** 12;
 

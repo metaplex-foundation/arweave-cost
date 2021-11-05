@@ -1,6 +1,9 @@
 const request = require('axios');
-const assert = require('assert');
 const debug = require('debug')('arweave-cost');
+
+const assert = (truthy: any, msg: string) => {
+  if (!truthy) throw new Error(msg);
+};
 
 const ARWEAVE_URL = 'https://arweave.net';
 const CONVERSION_RATES_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=solana,arweave&vs_currencies=usd';

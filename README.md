@@ -1,6 +1,6 @@
 # Arweave cost
 
-Calculates the cost of uploading files to [Arweave](https://arweave.org/)
+Calculates the cost of uploading files to [Arweave](https://arweave.org/) using [arbundles](https://github.com/Bundlr-Network/arbundles).
 
 ## Installation
 

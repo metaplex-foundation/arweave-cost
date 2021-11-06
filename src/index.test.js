@@ -86,8 +86,6 @@ describe('calculate', () => {
     assert(result.arweavePrice > 0, result.arweavePrice);
     assert(result.solanaPrice > 0, result.solanaPrice);
     assert(result.exchangeRate > 0, result.exchangeRate);
-    assert(result.byteCost > 0, result.byteCost);
     assert.strictEqual(result.totalBytes, fileSizes[0] + fileSizes[1]);
-    assert(result.fee > 0, result.fee);
   })
 })

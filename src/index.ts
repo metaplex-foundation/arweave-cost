@@ -1,8 +1,15 @@
 const request = require('axios');
-const assert = require('assert');
 const debug = require('debug')('arweave-cost');
 
-const ARWEAVE_URL = 'https://arweave.net';
+const assert = (truthy: any, msg: string) => {
+  if (!truthy) throw new Error(msg);
+};
+
+// arbundler uses a pricing endpoint which also accurately captures L2 fees.
+// https://node1.bundlr.network/price/{totalUploadedBytes}
+// internal fee calculation: fee(n) = bundler fee * l1_fee(1) * max(n, 2048) * network difficulty multiplier
+
+const ARWEAVE_URL = 'https://node1.bundlr.network';
 const CONVERSION_RATES_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=solana,arweave&vs_currencies=usd';
 const WINSTON_MULTIPLIER = 10 ** 12;
 
@@ -83,18 +90,6 @@ const kb = (kilobytes: number) => kilobytes * 1024;
 const MINIMUM_WINSTON_FEE = 10000000; // 0.00001 AR
 const AR_FEE_MULTIPLIER = 15 / 100; // 15%
 
-/**
- * 15% fee on top of storage cost or 0.00001 AR minimum for files < 100kb
- *
- * https://ardrive.atlassian.net/wiki/spaces/help/pages/86376465/Fees
- */
-const calculateFee = (totalBytes: number, storageCost: number): number => {
-  const fee = totalBytes < kb(100) ? MINIMUM_WINSTON_FEE :
-    storageCost * AR_FEE_MULTIPLIER;
-
-  return fee;
-};
-
 // test this. Then make public. Then pull into arweave cloud fn and metaplex
 export const calculate = async (
   fileSizes: number[]
@@ -104,9 +99,7 @@ export const calculate = async (
   arweavePrice: number,
   solanaPrice: number,
   exchangeRate: number,
-  byteCost: number,
   totalBytes: number,
-  fee: number
 }> => {
 
   validate(fileSizes);
@@ -115,13 +108,11 @@ export const calculate = async (
     return sum += fileSize;
   }, 0);
 
-  const [conversionRates, byteCost] = await Promise.all([
+  const [conversionRates, totalWinstonCost] = await Promise.all([
     fetchTokenPrices(),
     fetchArweaveStorageCost(totalBytes)
   ]);
 
-  const fee = calculateFee(totalBytes, byteCost);
-  const totalWinstonCost = byteCost + fee;
   const totalArCost = totalWinstonCost / WINSTON_MULTIPLIER;
 
   const arweavePrice = conversionRates.arweave.usd;
@@ -132,9 +123,7 @@ export const calculate = async (
     arweaveRate: arweavePrice,
     solanaRate: solanaPrice,
     exchangeRate,
-    byteCost,
     WINSTON_MULTIPLIER,
-    fee,
     totalWinstonCost,
     totalArCost,
     totalBytes
@@ -146,8 +135,6 @@ export const calculate = async (
     arweavePrice,
     solanaPrice,
     exchangeRate,
-    byteCost,
     totalBytes,
-    fee
   };
 };
